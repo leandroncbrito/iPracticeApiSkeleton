@@ -28,8 +28,6 @@ namespace iPractice.Api
                     Version = "v1",
                     Title = " iPractice APIs"
                 });
-
-
             });
             
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
