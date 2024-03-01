@@ -41,3 +41,6 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+identifier.sqlite
+iPractice.db-shm
+iPractice.db-wal
