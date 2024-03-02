@@ -4,9 +4,16 @@ namespace iPractice.Application.Commands;
 
 public class CreateAvailabilityCommand : ICommand
 {
-    public long PsychologistId { get; set; }
+    public long PsychologistId { get; private set; }
     
-    public DateTime From { get; set; }
+    public DateTime From { get; private set; }
     
-    public DateTime To { get; set; }
+    public DateTime To { get; private set; }
+    
+    public CreateAvailabilityCommand(long psychologistId, DateTime from, DateTime to)
+    {
+        PsychologistId = psychologistId;
+        From = from;
+        To = to;
+    }    
 }

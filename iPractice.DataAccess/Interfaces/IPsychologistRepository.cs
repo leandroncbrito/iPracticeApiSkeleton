@@ -5,5 +5,6 @@ namespace iPractice.DataAccess.Interfaces;
 
 public interface IPsychologistRepository
 {
-    Task<Psychologist?> GetAsync(long id);
+    Task UpdatePsychologistAsync(Psychologist psychologist);
+    Task<Psychologist?> GetPsychologistAsync(long id);
 }

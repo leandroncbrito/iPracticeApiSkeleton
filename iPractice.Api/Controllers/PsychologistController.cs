@@ -16,7 +16,9 @@ namespace iPractice.Api.Controllers
         private readonly ILogger<PsychologistController> _logger;
         private readonly ICommandHandler<CreateAvailabilityCommand> _createAvailabilityCommandHandler;
 
-        public PsychologistController(ICommandHandler<CreateAvailabilityCommand> createAvailabilityCommandHandler, ILogger<PsychologistController> logger)
+        public PsychologistController(
+            ICommandHandler<CreateAvailabilityCommand> createAvailabilityCommandHandler, 
+            ILogger<PsychologistController> logger)
         {
             _createAvailabilityCommandHandler = createAvailabilityCommandHandler;
             _logger = logger;
@@ -41,12 +43,7 @@ namespace iPractice.Api.Controllers
         {
             try
             {
-                var createAvailabilityCommand = new CreateAvailabilityCommand
-                {
-                    PsychologistId = psychologistId,
-                    From = availability.From,
-                    To = availability.To
-                };
+                var createAvailabilityCommand = new CreateAvailabilityCommand(psychologistId, availability.From, availability.To);
             
                 await _createAvailabilityCommandHandler.HandleAsync(createAvailabilityCommand);
             
@@ -62,7 +59,7 @@ namespace iPractice.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create availability");
+                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
                 return StatusCode((int)HttpStatusCode.InternalServerError, e);
             }
         }

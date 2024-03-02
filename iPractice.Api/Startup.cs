@@ -1,6 +1,9 @@
-using iPractice.Application.CommandHandlers;
+using System.Collections.Generic;
 using iPractice.Application.Commands;
+using iPractice.Application.Commands.Handlers;
 using iPractice.Application.Interfaces;
+using iPractice.Application.Queries;
+using iPractice.Application.Queries.Handlers;
 using iPractice.DataAccess;
 using iPractice.DataAccess.Interfaces;
 using iPractice.DataAccess.Repositories;
@@ -38,11 +41,14 @@ namespace iPractice.Api
 
             services.AddScoped<IRepository<Availability>, Repository<Availability>>();
             services.AddScoped<IRepository<Psychologist>, Repository<Psychologist>>();
+            services.AddScoped<IRepository<Client>, Repository<Client>>();
             
-            services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
             services.AddScoped<IPsychologistRepository, PsychologistRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
             
             services.AddScoped<ICommandHandler<CreateAvailabilityCommand>, CreateAvailabilityCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateAppointmentCommand>, CreateAppointmentCommandHandler>();
+            services.AddScoped<IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Psychologist>>, GetAvailablePsychologistsQueryHandler>();
             
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
 
