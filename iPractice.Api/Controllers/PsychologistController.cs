@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using iPractice.Api.Models;
+using iPractice.Application.Commands;
+using iPractice.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -13,9 +14,11 @@ namespace iPractice.Api.Controllers
     public class PsychologistController : ControllerBase
     {
         private readonly ILogger<PsychologistController> _logger;
+        private readonly ICommandHandler<CreateAvailabilityCommand> _createAvailabilityCommandHandler;
 
-        public PsychologistController(ILogger<PsychologistController> logger)
+        public PsychologistController(ICommandHandler<CreateAvailabilityCommand> createAvailabilityCommandHandler, ILogger<PsychologistController> logger)
         {
+            _createAvailabilityCommandHandler = createAvailabilityCommandHandler;
             _logger = logger;
         }
 
@@ -36,7 +39,32 @@ namespace iPractice.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> CreateAvailability([FromRoute] long psychologistId, [FromBody] Availability availability)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var createAvailabilityCommand = new CreateAvailabilityCommand
+                {
+                    PsychologistId = psychologistId,
+                    From = availability.From,
+                    To = availability.To
+                };
+            
+                await _createAvailabilityCommandHandler.HandleAsync(createAvailabilityCommand);
+            
+                var uri = new Uri($"{Request.Scheme}://{Request.Host}/api/psychologists/{psychologistId}");
+            
+                return Created(uri, true);
+            }
+            //@TODO: map to custom error response
+            catch (NullReferenceException e) 
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create availability");
+                return StatusCode((int)HttpStatusCode.InternalServerError, e);
+            }
         }
 
         /// <summary>

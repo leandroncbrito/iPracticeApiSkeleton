@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using iPractice.DataAccess.Models;
+using iPractice.Domain.Entities;
 
 namespace iPractice.DataAccess
 {

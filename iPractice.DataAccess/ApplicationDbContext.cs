@@ -1,4 +1,4 @@
-﻿using iPractice.DataAccess.Models;
+﻿using iPractice.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace iPractice.DataAccess
@@ -20,7 +20,7 @@ namespace iPractice.DataAccess
             modelBuilder.Entity<Client>().HasMany(p => p.Psychologists).WithMany(b => b.Clients);
             
             modelBuilder.Entity<Availability>().HasKey(availability => availability.Id);
-            modelBuilder.Entity<Psychologist>().HasMany(p => p.Availabilities).WithOne(a => a.Psychologist);
+            modelBuilder.Entity<Psychologist>().HasMany(psychologist => psychologist.Availabilities).WithOne(a => a.Psychologist);
         }
     }
 }

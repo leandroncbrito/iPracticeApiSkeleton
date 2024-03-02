@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\iPractice.DataAccess\iPractice.DataAccess.csproj" />
+    <ProjectReference Include="..\iPractice.Application\iPractice.Application.csproj" />
   </ItemGroup>
 
 

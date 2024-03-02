@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace iPractice.DataAccess.Models
+namespace iPractice.Domain.Entities
 {
     public class Client
     {

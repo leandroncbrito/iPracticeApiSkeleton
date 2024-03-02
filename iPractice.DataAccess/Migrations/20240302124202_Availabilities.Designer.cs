@@ -11,8 +11,8 @@ using iPractice.DataAccess;
 namespace iPractice.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301192222_Availability")]
-    partial class Availability
+    [Migration("20240302124202_Availabilities")]
+    partial class Availabilities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,7 +35,7 @@ namespace iPractice.DataAccess.Migrations
                     b.ToTable("ClientPsychologist");
                 });
 
-            modelBuilder.Entity("iPractice.DataAccess.Models.Availability", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.Availability", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +44,7 @@ namespace iPractice.DataAccess.Migrations
                     b.Property<DateTime>("From")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("PsychologistId")
+                    b.Property<long>("PsychologistId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("To")
@@ -57,13 +57,14 @@ namespace iPractice.DataAccess.Migrations
                     b.ToTable("Availabilities");
                 });
 
-            modelBuilder.Entity("iPractice.DataAccess.Models.Client", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.Client", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -71,13 +72,14 @@ namespace iPractice.DataAccess.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("iPractice.DataAccess.Models.Psychologist", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.Psychologist", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -87,29 +89,31 @@ namespace iPractice.DataAccess.Migrations
 
             modelBuilder.Entity("ClientPsychologist", b =>
                 {
-                    b.HasOne("iPractice.DataAccess.Models.Client", null)
+                    b.HasOne("iPractice.Domain.Entities.Client", null)
                         .WithMany()
                         .HasForeignKey("ClientsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("iPractice.DataAccess.Models.Psychologist", null)
+                    b.HasOne("iPractice.Domain.Entities.Psychologist", null)
                         .WithMany()
                         .HasForeignKey("PsychologistsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("iPractice.DataAccess.Models.Availability", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.Availability", b =>
                 {
-                    b.HasOne("iPractice.DataAccess.Models.Psychologist", "Psychologist")
+                    b.HasOne("iPractice.Domain.Entities.Psychologist", "Psychologist")
                         .WithMany("Availabilities")
-                        .HasForeignKey("PsychologistId");
+                        .HasForeignKey("PsychologistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Psychologist");
                 });
 
-            modelBuilder.Entity("iPractice.DataAccess.Models.Psychologist", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.Psychologist", b =>
                 {
                     b.Navigation("Availabilities");
                 });

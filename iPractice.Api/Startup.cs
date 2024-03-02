@@ -1,4 +1,10 @@
+using iPractice.Application.CommandHandlers;
+using iPractice.Application.Commands;
+using iPractice.Application.Interfaces;
 using iPractice.DataAccess;
+using iPractice.DataAccess.Interfaces;
+using iPractice.DataAccess.Repositories;
+using iPractice.Domain.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +35,14 @@ namespace iPractice.Api
                     Title = " iPractice APIs"
                 });
             });
+
+            services.AddScoped<IRepository<Availability>, Repository<Availability>>();
+            services.AddScoped<IRepository<Psychologist>, Repository<Psychologist>>();
+            
+            services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
+            services.AddScoped<IPsychologistRepository, PsychologistRepository>();
+            
+            services.AddScoped<ICommandHandler<CreateAvailabilityCommand>, CreateAvailabilityCommandHandler>();
             
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
 

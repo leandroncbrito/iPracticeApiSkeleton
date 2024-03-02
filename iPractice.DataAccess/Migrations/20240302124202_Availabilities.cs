@@ -6,11 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace iPractice.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Availability : Migration
+    public partial class Availabilities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Psychologists",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "TEXT",
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Clients",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "",
+                oldClrType: typeof(string),
+                oldType: "TEXT",
+                oldNullable: true);
+
             migrationBuilder.CreateTable(
                 name: "Availabilities",
                 columns: table => new
@@ -19,7 +39,7 @@ namespace iPractice.DataAccess.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     From = table.Column<DateTime>(type: "TEXT", nullable: false),
                     To = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: true)
+                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,7 +48,8 @@ namespace iPractice.DataAccess.Migrations
                         name: "FK_Availabilities_Psychologists_PsychologistId",
                         column: x => x.PsychologistId,
                         principalTable: "Psychologists",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -42,6 +63,22 @@ namespace iPractice.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Availabilities");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Psychologists",
+                type: "TEXT",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "TEXT");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "Clients",
+                type: "TEXT",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "TEXT");
         }
     }
 }

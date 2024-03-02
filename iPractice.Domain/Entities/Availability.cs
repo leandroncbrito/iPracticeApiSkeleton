@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace iPractice.DataAccess.Models
+namespace iPractice.Domain.Entities
 {
     public class Availability
     {
@@ -9,7 +9,7 @@ namespace iPractice.DataAccess.Models
         public DateTime From { get; set; }
         
         public DateTime To { get; set; }
-        
+
         public Psychologist Psychologist { get; set; }
     }
 }
