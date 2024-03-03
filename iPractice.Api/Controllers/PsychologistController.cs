@@ -1,10 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using iPractice.Api.Models;
 using iPractice.Application.Commands;
 using iPractice.Application.Interfaces;
-using iPractice.Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -14,18 +12,15 @@ namespace iPractice.Api.Controllers
     [Route("[controller]")]
     public class PsychologistController : ControllerBase
     {
-        private readonly ILogger<PsychologistController> _logger;
-        private readonly ICommandHandler<CreateTimeSlotsCommand> _createTimeSlotsCommandHandler;
+        private readonly ICommandHandler<CreateAvailabilityCommand> _createTimeSlotsCommandHandler;
         private readonly ICommandHandler<UpdateAvailabilityCommand> _updateAvailabilityCommandHandler;
 
         public PsychologistController(
-            ICommandHandler<CreateTimeSlotsCommand> createTimeSlotsCommandHandler,
-            ICommandHandler<UpdateAvailabilityCommand> updateAvailabilityCommandHandler,
-            ILogger<PsychologistController> logger)
+            ICommandHandler<CreateAvailabilityCommand> createTimeSlotsCommandHandler,
+            ICommandHandler<UpdateAvailabilityCommand> updateAvailabilityCommandHandler)
         {
             _createTimeSlotsCommandHandler = createTimeSlotsCommandHandler;
             _updateAvailabilityCommandHandler = updateAvailabilityCommandHandler;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -41,28 +36,15 @@ namespace iPractice.Api.Controllers
         /// <param name="availability">Availability</param>
         /// <returns>Ok if the availability was created</returns>
         [HttpPost("{psychologistId}/availability")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateAvailability([FromRoute] long psychologistId, [FromBody] Availability availability)
         {
-            try
-            {
-                var createTimeSlotsCommand = new CreateTimeSlotsCommand(psychologistId, availability.From, availability.To);
-            
-                await _createTimeSlotsCommandHandler.HandleAsync(createTimeSlotsCommand);
-            
-                return StatusCode((int)HttpStatusCode.Created, true);
-            }
-            catch (DomainException e) 
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, e);
-            }
+            var createTimeSlotsCommand = new CreateAvailabilityCommand(psychologistId, availability.From, availability.To);
+        
+            await _createTimeSlotsCommandHandler.HandleAsync(createTimeSlotsCommand);
+        
+            return StatusCode(StatusCodes.Status201Created, true);
         }
 
         /// <summary>
@@ -72,27 +54,15 @@ namespace iPractice.Api.Controllers
         /// <param name="availabilityId">The ID of the availability block</param>
         /// <returns>List of availability slots</returns>
         [HttpPut("{psychologistId}/availability/{availabilityId}")]
-        [ProducesResponseType(typeof(Availability), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Availability), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Availability>> UpdateAvailability([FromRoute] long psychologistId, [FromRoute] long availabilityId, [FromBody] Availability availability)
         {
-            try
-            {
-                var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologistId, availabilityId, availability.From, availability.To);
-                
-                await _updateAvailabilityCommandHandler.HandleAsync(updateAvailabilityCommand);
+            var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologistId, availabilityId, availability.From, availability.To);
+            
+            await _updateAvailabilityCommandHandler.HandleAsync(updateAvailabilityCommand);
 
-                return StatusCode((int)HttpStatusCode.NoContent, true);
-            }
-            catch (DomainException e) 
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, e);
-            }
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

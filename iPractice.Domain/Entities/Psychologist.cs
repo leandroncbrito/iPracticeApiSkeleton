@@ -7,11 +7,11 @@ namespace iPractice.Domain.Entities
         public long Id { get; set; }
         public string Name { get; set; }
         public List<Client> Clients { get; set; } = new ();
-        public List<TimeSlot> TimeSlots { get; set; } = new ();
+        public List<Availability> Availabilities { get; set; } = new ();
         
-        public void AddTimeSlots(IEnumerable<TimeSlot> timeSlots)
+        public void AddAvailability(IEnumerable<Availability> timeSlots)
         {
-            TimeSlots.AddRange(timeSlots);
+            Availabilities.AddRange(timeSlots);
         }
 
         public void Validate(long psychologistId)

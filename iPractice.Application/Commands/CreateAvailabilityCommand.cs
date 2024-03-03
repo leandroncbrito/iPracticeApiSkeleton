@@ -2,7 +2,7 @@
 
 namespace iPractice.Application.Commands;
 
-public class CreateTimeSlotsCommand : ICommand
+public class CreateAvailabilityCommand : ICommand
 {
     public long PsychologistId { get; private set; }
     
@@ -10,7 +10,7 @@ public class CreateTimeSlotsCommand : ICommand
     
     public DateTime To { get; private set; }
     
-    public CreateTimeSlotsCommand(long psychologistId, DateTime from, DateTime to)
+    public CreateAvailabilityCommand(long psychologistId, DateTime from, DateTime to)
     {
         PsychologistId = psychologistId;
         From = from;

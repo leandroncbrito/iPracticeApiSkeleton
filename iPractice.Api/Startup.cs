@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using iPractice.Api.Filters;
 using iPractice.Application.Commands;
 using iPractice.Application.Commands.Handlers;
 using iPractice.Application.Interfaces;
@@ -45,15 +46,18 @@ namespace iPractice.Api
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("Sqlite")));
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.Filters.Add<CustomExceptionFilter>();
+            });
         }
 
         private static void RegisterHandlers(IServiceCollection services)
         {
-            services.AddScoped<ITimeSlotService, TimeSlotService>();
+            services.AddScoped<IAvailabilityService, AvailabilityService>();
             
-            services.AddScoped<ICommandHandler<CreateTimeSlotsCommand>, CreateTimeSlotsCommandHandler>();
-            services.AddScoped<ICommandHandler<CreateAppointmentCommand>, CreateAppointmentCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateAvailabilityCommand>, CreateAvailabilityCommandHandler>();
+            services.AddScoped<ICommandHandler<MakeAppointmentCommand>, MakeAppointmentCommandHandler>();
             services.AddScoped<ICommandHandler<UpdateAvailabilityCommand>, UpdateAvailabilityCommandHandler>();
             
             services.AddScoped<IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Psychologist>>, GetAvailablePsychologistsQueryHandler>();
@@ -61,14 +65,14 @@ namespace iPractice.Api
 
         private void RegisterRepositories(IServiceCollection services)
         {
-            services.AddScoped<IRepository<TimeSlot>, Repository<TimeSlot>>();
+            services.AddScoped<IRepository<Availability>, Repository<Availability>>();
             services.AddScoped<IRepository<Psychologist>, Repository<Psychologist>>();
             services.AddScoped<IRepository<Client>, Repository<Client>>();
-            services.AddScoped<IRepository<TimeSlot>, Repository<TimeSlot>>();
+            services.AddScoped<IRepository<Availability>, Repository<Availability>>();
             
             services.AddScoped<IPsychologistRepository, PsychologistRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
-            services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+            services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,31 +7,31 @@ namespace iPractice.Application.Commands.Handlers;
 
 public class UpdateAvailabilityCommandHandler : ICommandHandler<UpdateAvailabilityCommand>
 {
-    private readonly ITimeSlotRepository _timeSlotRepository;
+    private readonly IAvailabilityRepository _availabilityRepository;
 
-    public UpdateAvailabilityCommandHandler(ITimeSlotRepository timeSlotRepository)
+    public UpdateAvailabilityCommandHandler(IAvailabilityRepository availabilityRepository)
     {
-        _timeSlotRepository = timeSlotRepository;
+        _availabilityRepository = availabilityRepository;
     }
 
     public async Task HandleAsync(UpdateAvailabilityCommand updateAvailabilityCommand)
     {
-        var timeSlot = await GetTimeSlotAsync(updateAvailabilityCommand);
+        var availability = await GetAvailabilityAsync(updateAvailabilityCommand);
         
-        timeSlot.UpdateAvailability(updateAvailabilityCommand.PsychologistId, updateAvailabilityCommand.From, updateAvailabilityCommand.To);
+        availability.UpdateAvailability(updateAvailabilityCommand.PsychologistId, updateAvailabilityCommand.From, updateAvailabilityCommand.To);
 
-        await _timeSlotRepository.UpdateTimeSlotAsync(timeSlot);
+        await _availabilityRepository.UpdateAvailabilityAsync(availability);
     }
     
-    private async Task<TimeSlot> GetTimeSlotAsync(UpdateAvailabilityCommand updateAvailabilityCommand)
+    private async Task<Availability> GetAvailabilityAsync(UpdateAvailabilityCommand updateAvailabilityCommand)
     {
-        var timeSlot = await _timeSlotRepository.GetTimeSlotAsync(updateAvailabilityCommand.TimeSlotId);
+        var availability = await _availabilityRepository.GetAvailabilityAsync(updateAvailabilityCommand.AvailabilityId);
         
-        if (timeSlot is null)
+        if (availability is null)
         {
-            throw new TimeSlotNotFoundException();
+            throw new AvailabilityNotFoundException();
         }
         
-        return timeSlot;
+        return availability;
     }
 }

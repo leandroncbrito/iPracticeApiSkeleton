@@ -7,7 +7,7 @@ namespace iPractice.DataAccess
     {
         public DbSet<Psychologist> Psychologists { get; set; }
         public DbSet<Client> Clients { get; set; }
-        public DbSet<TimeSlot> TimeSlots { get; set; }
+        public DbSet<Availability> Availabilities { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         { }
@@ -19,8 +19,8 @@ namespace iPractice.DataAccess
             modelBuilder.Entity<Psychologist>().HasMany(p => p.Clients).WithMany(b => b.Psychologists);
             modelBuilder.Entity<Client>().HasMany(p => p.Psychologists).WithMany(b => b.Clients);
             
-            modelBuilder.Entity<TimeSlot>().HasKey(timeSlot => timeSlot.Id);
-            modelBuilder.Entity<Psychologist>().HasMany(psychologist => psychologist.TimeSlots).WithOne(a => a.Psychologist);
+            modelBuilder.Entity<Availability>().HasKey(availability => availability.Id);
+            modelBuilder.Entity<Psychologist>().HasMany(psychologist => psychologist.Availabilities).WithOne(a => a.Psychologist);
         }
     }
 }

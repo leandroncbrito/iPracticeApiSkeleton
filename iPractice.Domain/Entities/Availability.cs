@@ -2,10 +2,15 @@
 
 namespace iPractice.Domain.Entities
 {
-    public class TimeSlot
+    public class Availability
     {
-        public TimeSlot(DateTime from, DateTime to)
+        protected Availability()
         {
+        }
+        
+        public Availability(Psychologist psychologist, DateTime from, DateTime to )
+        {
+            Psychologist = psychologist;
             From = from;
             To = to;
         }
@@ -20,42 +25,36 @@ namespace iPractice.Domain.Entities
         
         public Client Client { get; private set; }
         
-        public void AssignPsychologist(Psychologist psychologist)
+        public void AssignClient(Client client)
         {
-            Psychologist = psychologist;
-        }
-        
-        public void AssignClient(Client client, long psychologistId)
-        {
-            ValidatePsychologist(psychologistId);
+            Validate(client);
             
             Client = client;
         }
 
         public void UpdateAvailability(long psychologistId, DateTime from, DateTime to)
         {
-            ValidatePsychologist(psychologistId);
-            ValidateAvailability(from, to);
+            Psychologist.Validate(psychologistId);
             
             From = from;
             To = to;
         }
         
-        private void ValidatePsychologist(long psychologistId)
+        private void Validate(Client client)
         {
+            if (Client is not null)
+            {
+                throw new ClientAlreadyAssignedException();
+            }
+            
             if (Psychologist is null)
             {
                 throw new PsychologistNotFoundException();
             }
             
-            Psychologist.Validate(psychologistId);
-        }
-        
-        private void ValidateAvailability(DateTime from, DateTime to)
-        {
-            if (from >= to)
+            if (client.Psychologists.Contains(Psychologist) is false)
             {
-                throw new InvalidAvailabilityException();
+                throw new PsychologistMismatchException($"{nameof(Psychologist)} is not available for this client.");
             }
         }
     }

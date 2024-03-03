@@ -24,7 +24,7 @@ public class ClientRepository : IClientRepository
     {
         return await _repository.GetAsync(f => f.Id == id, i => i
             .Include(p => p.Psychologists)
-            .ThenInclude(p => p.TimeSlots.Where(t => t.Client == null)),
+            .ThenInclude(p => p.Availabilities.Where(t => t.Client == null)),
             true);
     }
 }

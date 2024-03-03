@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using iPractice.Api.Models;
 using iPractice.Application.Commands;
 using iPractice.Application.Interfaces;
 using iPractice.Application.Queries;
-using iPractice.Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace iPractice.Api.Controllers
 {
@@ -17,19 +14,15 @@ namespace iPractice.Api.Controllers
     [Route("[controller]")]
     public class ClientController : ControllerBase
     {
-        private readonly ICommandHandler<CreateAppointmentCommand> _createAppointmentCommandHandler;
+        private readonly ICommandHandler<MakeAppointmentCommand> _createAppointmentCommandHandler;
         private readonly IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Domain.Entities.Psychologist>> _getAvailableTimeSlotsQueryHandler;
 
-        private readonly ILogger<ClientController> _logger;
-        
         public ClientController(
-            ICommandHandler<CreateAppointmentCommand> createAppointmentCommandHandler,
-            IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Domain.Entities.Psychologist>> getAvailableTimeSlotsQueryHandler, 
-            ILogger<ClientController> logger)
+            ICommandHandler<MakeAppointmentCommand> createAppointmentCommandHandler,
+            IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Domain.Entities.Psychologist>> getAvailableTimeSlotsQueryHandler)
         {
             _createAppointmentCommandHandler = createAppointmentCommandHandler;
             _getAvailableTimeSlotsQueryHandler = getAvailableTimeSlotsQueryHandler;
-            _logger = logger;
         }
         
         /// <summary>
@@ -39,60 +32,35 @@ namespace iPractice.Api.Controllers
         /// <param name="clientId">The client ID</param>
         /// <returns>All time slots for the selected client</returns>
         [HttpGet("{clientId}/timeslots")]
-        [ProducesResponseType(typeof(IEnumerable<TimeSlot>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<TimeSlot>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<TimeSlot>>> GetAvailableTimeSlots(long clientId)
         {
-            try
-            {
-                var getAvailableSlotsQuery = new GetAvailablePsychologistsQuery(clientId);
-                
-                var psychologists = await _getAvailableTimeSlotsQueryHandler.HandleAsync(getAvailableSlotsQuery);
+            var getAvailableSlotsQuery = new GetAvailablePsychologistsQuery(clientId);
+            
+            var psychologists = await _getAvailableTimeSlotsQueryHandler.HandleAsync(getAvailableSlotsQuery);
 
-                var timeSlots = psychologists.Select(Psychologist.FromEntity);
-                
-                return Ok(timeSlots);
-            }
-            catch (DomainException e) 
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, "Error occurred while processing the request.");
-            }
+            var timeSlots = psychologists.Select(Psychologist.FromEntity);
+            
+            return Ok(timeSlots);
         }
 
         /// <summary>
         /// Create an appointment for a given availability slot
         /// </summary>
         /// <param name="clientId">The client ID</param>
-        /// <param name="appointment">Identifies the psychologist and availability slot</param>
+        /// <param name="appointment">Identifies the availability slot</param>
         /// <returns>Ok if appointment was made</returns>
         [HttpPost("{clientId}/appointment")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> CreateAppointment(long clientId, [FromBody] Appointment appointment)
         {
-            try
-            {
-                var createAppointmentCommand = new CreateAppointmentCommand(clientId, appointment.PsychologistId, appointment.TimeSlotId);
-                
-                await _createAppointmentCommandHandler.HandleAsync(createAppointmentCommand);
+            var createAppointmentCommand = new MakeAppointmentCommand(clientId, appointment.TimeSlotId);
+            
+            await _createAppointmentCommandHandler.HandleAsync(createAppointmentCommand);
 
-                return StatusCode((int)HttpStatusCode.Created, true);
-            }
-            catch (DomainException e) 
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
-                return StatusCode((int)HttpStatusCode.InternalServerError, e);
-            }
+            return StatusCode(StatusCodes.Status201Created, true);
         }
     }
 }

@@ -14,7 +14,7 @@ public class Psychologist
         {
             Id = psychologist.Id,
             Name = psychologist.Name,
-            TimeSlots = psychologist.TimeSlots.Select(timeSlot => new TimeSlot
+            TimeSlots = psychologist.Availabilities.Select(timeSlot => new TimeSlot
             {
                 Id = timeSlot.Id,
                 From = timeSlot.From,
