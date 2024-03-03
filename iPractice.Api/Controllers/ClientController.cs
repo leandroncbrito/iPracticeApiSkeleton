@@ -14,14 +14,14 @@ namespace iPractice.Api.Controllers
     [Route("[controller]")]
     public class ClientController : ControllerBase
     {
-        private readonly ICommandHandler<MakeAppointmentCommand> _createAppointmentCommandHandler;
+        private readonly ICommandHandler<MakeAppointmentCommand> _makeAppointmentCommandHandler;
         private readonly IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Domain.Entities.Psychologist>> _getAvailableTimeSlotsQueryHandler;
 
         public ClientController(
-            ICommandHandler<MakeAppointmentCommand> createAppointmentCommandHandler,
+            ICommandHandler<MakeAppointmentCommand> makeAppointmentCommandHandler,
             IQueryHandler<GetAvailablePsychologistsQuery, IEnumerable<Domain.Entities.Psychologist>> getAvailableTimeSlotsQueryHandler)
         {
-            _createAppointmentCommandHandler = createAppointmentCommandHandler;
+            _makeAppointmentCommandHandler = makeAppointmentCommandHandler;
             _getAvailableTimeSlotsQueryHandler = getAvailableTimeSlotsQueryHandler;
         }
         
@@ -58,7 +58,7 @@ namespace iPractice.Api.Controllers
         {
             var createAppointmentCommand = new MakeAppointmentCommand(clientId, appointment.TimeSlotId);
             
-            await _createAppointmentCommandHandler.HandleAsync(createAppointmentCommand);
+            await _makeAppointmentCommandHandler.HandleAsync(createAppointmentCommand);
 
             return StatusCode(StatusCodes.Status201Created, true);
         }
