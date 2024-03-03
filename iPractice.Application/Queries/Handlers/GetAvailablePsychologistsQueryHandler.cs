@@ -28,7 +28,7 @@ public class
         {
             throw new ClientNotFoundException();
         }
-        
+
         return client.Psychologists;
     }
 }

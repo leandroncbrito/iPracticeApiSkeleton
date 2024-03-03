@@ -8,6 +8,11 @@ namespace iPractice.Domain.Entities
         {
         }
         
+        public Availability(long id, Psychologist psychologist, DateTime from, DateTime to ) : this(psychologist, from, to)
+        {
+            Id = id;
+        }
+        
         public Availability(Psychologist psychologist, DateTime from, DateTime to )
         {
             Psychologist = psychologist;

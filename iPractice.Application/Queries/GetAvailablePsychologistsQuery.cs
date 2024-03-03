@@ -1,6 +1,9 @@
+using iPractice.Application.Interfaces;
+using iPractice.Domain.Entities;
+
 namespace iPractice.Application.Queries;
 
-public class GetAvailablePsychologistsQuery
+public class GetAvailablePsychologistsQuery : IQuery<IEnumerable<Psychologist>>
 {
     public GetAvailablePsychologistsQuery(long clientId)
     {

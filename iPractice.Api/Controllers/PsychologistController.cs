@@ -4,7 +4,6 @@ using iPractice.Application.Commands;
 using iPractice.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace iPractice.Api.Controllers
 {
