@@ -5,10 +5,10 @@ namespace iPractice.Application.Queries;
 
 public class GetAvailablePsychologistsQuery : IQuery<IEnumerable<Psychologist>>
 {
+    public long ClientId { get; private set; }
+    
     public GetAvailablePsychologistsQuery(long clientId)
     {
         ClientId = clientId;
     }
-    
-    public long ClientId { get; private set; }
 }
