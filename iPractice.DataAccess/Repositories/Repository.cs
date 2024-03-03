@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -19,17 +18,6 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         _context = context;
         _dbSet = _context.Set<TEntity>();
     }
-    
-    // public async Task InsertAsync(TEntity entity)
-    // {
-    //     if (entity == null)
-    //     {
-    //         throw new ArgumentNullException(nameof(entity));
-    //     }
-    //
-    //     await _dbSet.AddAsync(entity);
-    //     await SaveChangesAsync();
-    // }
 
     public async Task UpdateAsync(TEntity entity)
     {
@@ -42,54 +30,46 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         await SaveChangesAsync();
     }
 
-    public async Task<TEntity?> GetAsync(long id)
+    public async Task<TEntity> GetAsync(long id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? filter = null, 
-        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
+    public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter = null, 
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+        bool disableTracking = true)
     {
-        IQueryable<TEntity> query = _dbSet;
+        var query = BuildQuery(filter, include, disableTracking);
 
-        query = query.AsNoTracking();
+        return await query.FirstOrDefaultAsync();
+    }
+
+    private IQueryable<TEntity> BuildQuery(Expression<Func<TEntity, bool>> filter, 
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include, 
+        bool disableTracking = true)
+    {
+        if (disableTracking)
+        {
+            _dbSet.AsNoTrackingWithIdentityResolution();
+        }
+
+        IQueryable<TEntity> query = _dbSet;
+        
+        if (include != null)
+        {
+            query = include(query);
+        }
 
         if (filter != null)
         {
             query = query.Where(filter);
         }
-
-        if (include != null)
-        {
-            query = include(query);
-        }
         
-        return await query.FirstOrDefaultAsync();
+        return query;
     }
 
     private async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
     }
-    
-    // private bool _disposed;
-
-    // protected virtual void Dispose(bool disposing)
-    // {
-    //     if (!_disposed)
-    //     {
-    //         if (disposing)
-    //         {
-    //             _context.Dispose();
-    //         }
-    //     }
-    //     
-    //     _disposed = true;
-    // }
-    //
-    // public void Dispose()
-    // {
-    //     Dispose(true);
-    //     GC.SuppressFinalize(this);
-    // }
 }

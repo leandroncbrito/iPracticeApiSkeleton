@@ -11,8 +11,8 @@ using iPractice.DataAccess;
 namespace iPractice.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240302124202_Availabilities")]
-    partial class Availabilities
+    [Migration("20240302192113_TimeSlots")]
+    partial class TimeSlots
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,28 +33,6 @@ namespace iPractice.DataAccess.Migrations
                     b.HasIndex("PsychologistsId");
 
                     b.ToTable("ClientPsychologist");
-                });
-
-            modelBuilder.Entity("iPractice.Domain.Entities.Availability", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("From")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("PsychologistId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("To")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PsychologistId");
-
-                    b.ToTable("Availabilities");
                 });
 
             modelBuilder.Entity("iPractice.Domain.Entities.Client", b =>
@@ -87,6 +65,33 @@ namespace iPractice.DataAccess.Migrations
                     b.ToTable("Psychologists");
                 });
 
+            modelBuilder.Entity("iPractice.Domain.Entities.TimeSlot", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("ClientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("PsychologistId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("PsychologistId");
+
+                    b.ToTable("TimeSlots");
+                });
+
             modelBuilder.Entity("ClientPsychologist", b =>
                 {
                     b.HasOne("iPractice.Domain.Entities.Client", null)
@@ -102,20 +107,31 @@ namespace iPractice.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("iPractice.Domain.Entities.Availability", b =>
+            modelBuilder.Entity("iPractice.Domain.Entities.TimeSlot", b =>
                 {
+                    b.HasOne("iPractice.Domain.Entities.Client", "Client")
+                        .WithMany("Appointments")
+                        .HasForeignKey("ClientId");
+
                     b.HasOne("iPractice.Domain.Entities.Psychologist", "Psychologist")
-                        .WithMany("Availabilities")
+                        .WithMany("TimeSlots")
                         .HasForeignKey("PsychologistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Client");
+
                     b.Navigation("Psychologist");
+                });
+
+            modelBuilder.Entity("iPractice.Domain.Entities.Client", b =>
+                {
+                    b.Navigation("Appointments");
                 });
 
             modelBuilder.Entity("iPractice.Domain.Entities.Psychologist", b =>
                 {
-                    b.Navigation("Availabilities");
+                    b.Navigation("TimeSlots");
                 });
 #pragma warning restore 612, 618
         }

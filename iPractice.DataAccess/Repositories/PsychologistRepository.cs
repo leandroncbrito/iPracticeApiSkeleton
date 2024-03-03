@@ -19,9 +19,9 @@ public class PsychologistRepository : IPsychologistRepository
         await _repository.UpdateAsync(psychologist);
     }
 
-    public async Task<Psychologist?> GetPsychologistAsync(long id)
+    public async Task<Psychologist> GetPsychologistAsync(long id)
     {
-        return await _repository.GetAsync(f => f.Id == id, 
-            i => i.Include(p => p.Availabilities));
+        return await _repository.GetAsync(f => f.Id == id, i => i
+            .Include(p => p.TimeSlots));
     }
 }

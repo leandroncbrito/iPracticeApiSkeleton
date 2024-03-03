@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace iPractice.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Availabilities : Migration
+    public partial class TimeSlots : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,20 +32,26 @@ namespace iPractice.DataAccess.Migrations
                 oldNullable: true);
 
             migrationBuilder.CreateTable(
-                name: "Availabilities",
+                name: "TimeSlots",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     From = table.Column<DateTime>(type: "TEXT", nullable: false),
                     To = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: false)
+                    PsychologistId = table.Column<long>(type: "INTEGER", nullable: false),
+                    ClientId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Availabilities", x => x.Id);
+                    table.PrimaryKey("PK_TimeSlots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Availabilities_Psychologists_PsychologistId",
+                        name: "FK_TimeSlots_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TimeSlots_Psychologists_PsychologistId",
                         column: x => x.PsychologistId,
                         principalTable: "Psychologists",
                         principalColumn: "Id",
@@ -53,8 +59,13 @@ namespace iPractice.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_PsychologistId",
-                table: "Availabilities",
+                name: "IX_TimeSlots_ClientId",
+                table: "TimeSlots",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeSlots_PsychologistId",
+                table: "TimeSlots",
                 column: "PsychologistId");
         }
 
@@ -62,7 +73,7 @@ namespace iPractice.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Availabilities");
+                name: "TimeSlots");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",

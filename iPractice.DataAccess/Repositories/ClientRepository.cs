@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using iPractice.DataAccess.Interfaces;
 using iPractice.Domain.Entities;
@@ -19,10 +20,11 @@ public class ClientRepository : IClientRepository
         await _repository.UpdateAsync(client);
     }
     
-    public async Task<Client?> GetClientAsync(long id)
+    public async Task<Client> GetClientAsync(long id)
     {
-        return await _repository.GetAsync(f => f.Id == id,
-            i => i.Include(p => p.Psychologists)
-                .ThenInclude(p => p.Availabilities));
+        return await _repository.GetAsync(f => f.Id == id, i => i
+            .Include(p => p.Psychologists)
+            .ThenInclude(p => p.TimeSlots.Where(t => t.Client == null)),
+            true);
     }
 }

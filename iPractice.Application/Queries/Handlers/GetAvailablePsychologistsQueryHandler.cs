@@ -1,6 +1,7 @@
 using iPractice.Application.Interfaces;
 using iPractice.DataAccess.Interfaces;
 using iPractice.Domain.Entities;
+using iPractice.Domain.Exceptions;
 
 namespace iPractice.Application.Queries.Handlers;
 
@@ -14,16 +15,20 @@ public class
         _clientRepository = clientRepository;
     }
 
-    public async Task<IEnumerable<Psychologist>> HandleAsync(
-        GetAvailablePsychologistsQuery getAvailablePsychologistsQuery)
+    public async Task<IEnumerable<Psychologist>> HandleAsync(GetAvailablePsychologistsQuery getAvailablePsychologistsQuery)
+    {
+        return await GetAvailablePsychologists(getAvailablePsychologistsQuery);
+    }
+
+    private async Task<IEnumerable<Psychologist>> GetAvailablePsychologists(GetAvailablePsychologistsQuery getAvailablePsychologistsQuery)
     {
         var client = await _clientRepository.GetClientAsync(getAvailablePsychologistsQuery.ClientId);
 
         if (client is null)
         {
-            throw new NullReferenceException("Client not found");
+            throw new ClientNotFoundException();
         }
-
+        
         return client.Psychologists;
     }
 }

@@ -6,5 +6,5 @@ namespace iPractice.DataAccess.Interfaces;
 public interface IClientRepository
 {
     Task UpdateClientAsync(Client client);
-    Task<Client?> GetClientAsync(long id);
+    Task<Client> GetClientAsync(long id);
 }

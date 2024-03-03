@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using iPractice.Api.Models;
 using iPractice.Application.Commands;
 using iPractice.Application.Interfaces;
+using iPractice.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -14,13 +15,16 @@ namespace iPractice.Api.Controllers
     public class PsychologistController : ControllerBase
     {
         private readonly ILogger<PsychologistController> _logger;
-        private readonly ICommandHandler<CreateAvailabilityCommand> _createAvailabilityCommandHandler;
+        private readonly ICommandHandler<CreateTimeSlotsCommand> _createTimeSlotsCommandHandler;
+        private readonly ICommandHandler<UpdateAvailabilityCommand> _updateAvailabilityCommandHandler;
 
         public PsychologistController(
-            ICommandHandler<CreateAvailabilityCommand> createAvailabilityCommandHandler, 
+            ICommandHandler<CreateTimeSlotsCommand> createTimeSlotsCommandHandler,
+            ICommandHandler<UpdateAvailabilityCommand> updateAvailabilityCommandHandler,
             ILogger<PsychologistController> logger)
         {
-            _createAvailabilityCommandHandler = createAvailabilityCommandHandler;
+            _createTimeSlotsCommandHandler = createTimeSlotsCommandHandler;
+            _updateAvailabilityCommandHandler = updateAvailabilityCommandHandler;
             _logger = logger;
         }
 
@@ -43,16 +47,13 @@ namespace iPractice.Api.Controllers
         {
             try
             {
-                var createAvailabilityCommand = new CreateAvailabilityCommand(psychologistId, availability.From, availability.To);
+                var createTimeSlotsCommand = new CreateTimeSlotsCommand(psychologistId, availability.From, availability.To);
             
-                await _createAvailabilityCommandHandler.HandleAsync(createAvailabilityCommand);
+                await _createTimeSlotsCommandHandler.HandleAsync(createTimeSlotsCommand);
             
-                var uri = new Uri($"{Request.Scheme}://{Request.Host}/api/psychologists/{psychologistId}");
-            
-                return Created(uri, true);
+                return StatusCode((int)HttpStatusCode.Created, true);
             }
-            //@TODO: map to custom error response
-            catch (NullReferenceException e) 
+            catch (DomainException e) 
             {
                 _logger.LogError(e, e.Message);
                 return BadRequest(e.Message);
@@ -74,7 +75,24 @@ namespace iPractice.Api.Controllers
         [ProducesResponseType(typeof(Availability), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<Availability>> UpdateAvailability([FromRoute] long psychologistId, [FromRoute] long availabilityId, [FromBody] Availability availability)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologistId, availabilityId, availability.From, availability.To);
+                
+                await _updateAvailabilityCommandHandler.HandleAsync(updateAvailabilityCommand);
+
+                return StatusCode((int)HttpStatusCode.NoContent, true);
+            }
+            catch (DomainException e) 
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unhandled exception occurred while processing the request.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, e);
+            }
         }
     }
 }

@@ -1,21 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 
 namespace iPractice.Api.Models
 {
     public class TimeSlot
     {
-        public Psychologist Psychologist { get; set; }
-
-        private TimeSlot(Psychologist psychologist)
-        {
-            Psychologist = psychologist;
-        }
-
-        //TODO: move to factory
-        public static IEnumerable<TimeSlot> FromEntity(IEnumerable<Domain.Entities.Psychologist> psychologistAvailabilities)
-        {
-            return psychologistAvailabilities.Select(x => new TimeSlot(Psychologist.FromEntity(x)));
-        }
+        public long Id { get; set; }
+        
+        public DateTime From { get; set; }
+        
+        public DateTime To { get; set; }
     }
 }

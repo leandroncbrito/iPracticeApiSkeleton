@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using iPractice.Api.Models;
 using iPractice.Application.Commands;
 using iPractice.Application.Interfaces;
 using iPractice.Application.Queries;
+using iPractice.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -44,15 +46,13 @@ namespace iPractice.Api.Controllers
             {
                 var getAvailableSlotsQuery = new GetAvailablePsychologistsQuery(clientId);
                 
-                var psychologistAvailabilities = await _getAvailableTimeSlotsQueryHandler.HandleAsync(getAvailableSlotsQuery);
+                var psychologists = await _getAvailableTimeSlotsQueryHandler.HandleAsync(getAvailableSlotsQuery);
 
-                // TODO: move to factory
-                var timeSlots = TimeSlot.FromEntity(psychologistAvailabilities);
-
+                var timeSlots = psychologists.Select(Psychologist.FromEntity);
+                
                 return Ok(timeSlots);
             }
-            //@TODO: map to custom error response
-            catch (NullReferenceException e) 
+            catch (DomainException e) 
             {
                 _logger.LogError(e, e.Message);
                 return BadRequest(e.Message);
@@ -77,17 +77,13 @@ namespace iPractice.Api.Controllers
         {
             try
             {
-                var createAppointmentCommand = new CreateAppointmentCommand(clientId, appointment.TimeSlotId);
+                var createAppointmentCommand = new CreateAppointmentCommand(clientId, appointment.PsychologistId, appointment.TimeSlotId);
                 
                 await _createAppointmentCommandHandler.HandleAsync(createAppointmentCommand);
 
-                // TODO: move to factory
-                // var timeSlots = TimeSlot.FromEntity(psychologistAvailabilities);
-
-                return Ok();
+                return StatusCode((int)HttpStatusCode.Created, true);
             }
-            //@TODO: map to custom error response
-            catch (NullReferenceException e) 
+            catch (DomainException e) 
             {
                 _logger.LogError(e, e.Message);
                 return BadRequest(e.Message);
