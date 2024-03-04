@@ -5,17 +5,11 @@ namespace iPractice.Unit.Tests.Builders;
 public class AvailabilityBuilder
 {
     private long _id { get; set; } = 1;
-    private Psychologist _psychologist { get; set; } = new PsychologistBuilder().Build();
+    private Psychologist _psychologist { get; set; } = new ();
     private Client _client { get; set; } = null;
     private DateTime _from { get; set; } = DateTime.Now;
     private DateTime _to { get; set; } = DateTime.Now.AddMinutes(30);
-    
-    public AvailabilityBuilder WithId(long id)
-    {
-        _id = id;
-        return this;
-    }
-    
+   
     public AvailabilityBuilder WithClient(Client client)
     {
         _client = client;

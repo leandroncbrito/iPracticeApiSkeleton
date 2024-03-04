@@ -4,29 +4,27 @@ namespace iPractice.Unit.Tests.Builders;
 
 public class ClientBuilder
 {
+    private Client _client { get; set; }
     private long _id { get; set; } = 1;
     private string _name { get; set; } = "Client Test";
-    private List<Psychologist> _psychologists { get; set; } = new ();
-    
-    public ClientBuilder WithId(long id)
+
+    public ClientBuilder()
     {
-        _id = id;
-        return this;
+        _client = new Client
+        {
+            Id = _id,
+            Name = _name
+        };
     }
     
     public ClientBuilder AddPsychologists(Psychologist psychologist)
     {
-        _psychologists.Add(psychologist);
+        _client.Psychologists.Add(psychologist);
         return this;
     }
     
     public Client Build()
     {
-        return new Client
-        {
-            Id = _id,
-            Name = _name,
-            Psychologists = _psychologists.ToList()
-        };
+        return _client;
     }
 }

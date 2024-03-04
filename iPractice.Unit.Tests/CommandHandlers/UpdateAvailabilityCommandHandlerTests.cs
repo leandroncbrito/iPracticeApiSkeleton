@@ -23,17 +23,17 @@ namespace iPractice.Unit.Tests.CommandHandlers
             // Arrange
             var dateTimeNow = DateTime.Now;
 
-            var psychologist = new PsychologistBuilder().Build();
-
-            var availability = new AvailabilityBuilder()
-                .WithPsychologist(psychologist)
+            var psychologist = new PsychologistBuilder()
+                .AddAvailability()
                 .Build();
-            
+
+            var availability = psychologist.Availabilities.FirstOrDefault();
+
             _availabilityRepositoryMock.Setup(x => x.GetAvailabilityAsync(availability.Id))
                 .ReturnsAsync(availability);
             
             // Act
-            var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologist.Id, availability.Id, dateTimeNow.AddHours(1), dateTimeNow.AddHours(1).AddMinutes(30));
+            var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologist.Id, availability!.Id, dateTimeNow.AddHours(1), dateTimeNow.AddHours(1).AddMinutes(30));
             var sut = new UpdateAvailabilityCommandHandler(_availabilityRepositoryMock.Object);
             
             await sut.HandleAsync(updateAvailabilityCommand);
@@ -48,17 +48,17 @@ namespace iPractice.Unit.Tests.CommandHandlers
             // Arrange
             var dateTimeNow = DateTime.Now;
 
-            var psychologist = new PsychologistBuilder().Build();
-            
-            var availability = new AvailabilityBuilder()
-                .WithPsychologist(psychologist)
+            var psychologist = new PsychologistBuilder()
+                .AddAvailability()
                 .Build();
+            
+            var availability = psychologist.Availabilities.FirstOrDefault();
             
             _availabilityRepositoryMock.Setup(x => x.GetAvailabilityAsync(availability.Id))
                 .ReturnsAsync((Availability)null);
             
             // Act
-            var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologist.Id, availability.Id, dateTimeNow.AddHours(1), dateTimeNow.AddHours(1).AddMinutes(30));
+            var updateAvailabilityCommand = new UpdateAvailabilityCommand(psychologist.Id, availability!.Id, dateTimeNow.AddHours(1), dateTimeNow.AddHours(1).AddMinutes(30));
             var sut = new UpdateAvailabilityCommandHandler(_availabilityRepositoryMock.Object);
             
             // Assert

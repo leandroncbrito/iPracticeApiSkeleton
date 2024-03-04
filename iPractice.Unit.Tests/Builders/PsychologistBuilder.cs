@@ -4,66 +4,41 @@ namespace iPractice.Unit.Tests.Builders;
 
 public class PsychologistBuilder
 {
+    private Psychologist _psychologist { get; set; }
     private long _id { get; set; } = 1;
     private string _name { get; set; } = "Psychologist Test";
-    
     private List<Availability> _availabilities { get; set; } = new ();
+
+    public PsychologistBuilder()
+    {
+        _psychologist = new Psychologist
+        {
+            Id = _id,
+            Name = _name
+        };
+    }
     
     public PsychologistBuilder WithId(long id)
     {
-        _id = id;
+        _psychologist.Id = id;
         return this;
     }
     
-    public PsychologistBuilder WithName(string name)
+    public PsychologistBuilder AddAvailability()
     {
-        _name = name;
-        return this;
-    }
-    
-    // public PsychologistBuilder AddAvailability(Availability availability)
-    // {
-    //     _availabilities.Add(availability);
-    //     return this;
-    // }
-    
-    public List<Psychologist> BuildMany(int availabilityQuantity = 2)
-    {
-        var psychologists = new List<Psychologist>();
+        var availability= new AvailabilityBuilder()
+            .WithPsychologist(_psychologist)
+            .Build();
         
-        for (var i = 1; i <= 2; i++)
-        {
-            var psychologist = new PsychologistBuilder()
-                .WithId(i)
-                .WithName(_name + $" {i}")
-                .Build();
-            
-            var availabilities = new List<Availability>();
+        _availabilities.Add(availability);
 
-            for (var j = 1; j <= availabilityQuantity; j++)
-            {
-                availabilities.Add(new AvailabilityBuilder()
-                    .WithId(int.Parse($"{i}{j}")) 
-                    .WithFrom(DateTime.Now.AddHours(j))
-                    .WithTo(DateTime.Now.AddHours(j).AddMinutes(30))
-                    .WithPsychologist(psychologist)
-                    .Build());
-            }
-            
-            psychologist.AddAvailability(availabilities);
-            psychologists.Add(psychologist);
-        }
-
-        return psychologists;
+        return this;
     }
     
     public Psychologist Build()
     {
-        return new Psychologist
-        {
-            Id = _id,
-            Name = _name,
-            Availabilities = _availabilities.ToList()
-        };
+        _psychologist.AddAvailability(_availabilities);
+        
+        return _psychologist;
     }
 }

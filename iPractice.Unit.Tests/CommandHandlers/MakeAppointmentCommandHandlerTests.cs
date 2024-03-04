@@ -102,7 +102,8 @@ namespace iPractice.Unit.Tests.CommandHandlers
         public async Task Client_MakingAppointmentAlreadyAssigned_ShouldFail()
         {
             // Arrange
-            var psychologist = new PsychologistBuilder().Build();
+            var psychologist = new PsychologistBuilder()
+                .Build();
             
             var client = new ClientBuilder()
                 .AddPsychologists(psychologist)
@@ -134,19 +135,16 @@ namespace iPractice.Unit.Tests.CommandHandlers
         public async Task Client_MakingAppointmentWithInvalidPsychologist_ShouldFail()
         {
             // Arrange
-            var psychologist = new PsychologistBuilder().Build();
-            
-            var invalidPsychologist = new PsychologistBuilder()
-                .WithId(2)
-                .Build();
-            
             var client = new ClientBuilder()
-                .AddPsychologists(psychologist)
+                .AddPsychologists(new PsychologistBuilder().Build())
                 .Build();
             
-            var availability = new AvailabilityBuilder()
-                .WithPsychologist(invalidPsychologist)
+            var psychologist = new PsychologistBuilder()
+                .WithId(2)
+                .AddAvailability()
                 .Build();
+
+            var availability = psychologist.Availabilities.FirstOrDefault();
             
             _clientRepositoryMock.Setup(x => x.GetClientAsync(client.Id))
                 .ReturnsAsync(client);
@@ -155,7 +153,7 @@ namespace iPractice.Unit.Tests.CommandHandlers
                 .ReturnsAsync(availability);
             
             // Act
-            var makeAppointmentCommand = new MakeAppointmentCommand(client.Id, availability.Id);
+            var makeAppointmentCommand = new MakeAppointmentCommand(client.Id, availability!.Id);
             var sut = new MakeAppointmentCommandHandler(_availabilityRepositoryMock.Object, _clientRepositoryMock.Object);
             
             // Assert

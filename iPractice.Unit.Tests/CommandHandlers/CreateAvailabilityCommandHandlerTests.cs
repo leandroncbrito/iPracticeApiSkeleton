@@ -25,17 +25,17 @@ namespace iPractice.Unit.Tests.CommandHandlers
         {
             // Arrange
             var dateTimeNow = DateTime.Now;
-
-            var psychologist = new PsychologistBuilder().Build();
             
-            var availabilities = new AvailabilityBuilder()
-                .WithPsychologist(psychologist)
+            var psychologist = new PsychologistBuilder()
+                .AddAvailability()
                 .Build();
+
+            var availabilities = psychologist.Availabilities;
             
             var createAvailabilityCommand = new CreateAvailabilityCommand(psychologist.Id, dateTimeNow, dateTimeNow.AddMinutes(30));
            
             _availabilityServiceMock.Setup(x => x.GenerateAvailabilitiesFromBatch(psychologist, createAvailabilityCommand))
-                .Returns(new List<Availability> { availabilities });
+                .Returns(availabilities);
             
             _psychologistRepositoryMock.Setup(x => x.GetPsychologistAsync(psychologist.Id))
                 .ReturnsAsync(psychologist);

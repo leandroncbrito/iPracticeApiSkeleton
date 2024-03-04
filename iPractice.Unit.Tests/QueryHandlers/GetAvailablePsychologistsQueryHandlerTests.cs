@@ -21,13 +21,9 @@ namespace iPractice.Unit.Tests.QueryHandlers
         public async Task Client_WithPsychologistsAvailable_ShouldReturnTimeSlots()
         {
             // Arrange
-            var psychologist = new PsychologistBuilder().Build();
-            
-            var availabilities = new AvailabilityBuilder()
-                .WithPsychologist(psychologist)
+            var psychologist = new PsychologistBuilder()
+                .AddAvailability()
                 .Build();
-            
-            psychologist.AddAvailability(new List<Availability>{ availabilities });
             
             var client = new ClientBuilder()
                 .AddPsychologists(psychologist)

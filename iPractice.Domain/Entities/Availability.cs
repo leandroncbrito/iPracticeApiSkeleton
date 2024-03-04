@@ -57,7 +57,7 @@ namespace iPractice.Domain.Entities
                 throw new PsychologistNotFoundException();
             }
             
-            if (client.Psychologists.Contains(Psychologist) is false)
+            if (client.Psychologists.Any(x => x.Id == Psychologist.Id) is false)
             {
                 throw new PsychologistMismatchException($"{nameof(Psychologist)} is not available for this client.");
             }
